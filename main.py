@@ -17,14 +17,39 @@ LASER = pygame.image.load(os.path.join("images", "pixel_laser_green.png"))
 BG = pygame.image.load(os.path.join("images", "backgr.jpg"))
 
 
+class Ship:
+
+    def __init__(self, x, y, health=100):
+        self.x = x
+        self.y = y
+        self.health = health
+        self.ship_image = None
+
+    def draw(self, window):
+        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50))
+
+
+class Player(Ship):
+    def __init__(self, x, y, health=100):
+        super().__init__(x, y, health)
+        self.ship_image = MAIN_SPACE_SHIP
+
+    def draw(self, window):
+        super().draw(window)
+
+
 def main():
     run = True
     FPS = 60
+
+    player = Player(570, 500)
 
     clock = pygame.time.Clock()
 
     def redraw_window():
         WIN.blit(BG, (0, 0))
+
+        player.draw(WIN)
         pygame.display.update()
 
     while run:
@@ -33,5 +58,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
 
 main()
