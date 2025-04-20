@@ -28,6 +28,12 @@ class Ship:
     def draw(self, window):
         window.blit(self.ship_image, (self.x, self.y))
 
+    def get_width(self):
+        return self.ship_image.get_width()
+
+    def get_height(self):
+        return self.ship_image.get_height()
+
 
 class Player(Ship):
     def __init__(self, x, y, health=100):
@@ -41,6 +47,7 @@ class Player(Ship):
 def main():
     run = True
     FPS = 60
+    player_vel = 10
 
     player = Player(570, 500)
 
@@ -58,6 +65,19 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] and player.x - player_vel > 0:  # left
+            player.x -= player_vel
+        if keys[pygame.K_d] and player.x + player_vel + player.get_width() < WIDTH:  # right
+            player.x += player_vel
+        if keys[pygame.K_w] and player.y - player_vel > 0:  # up
+            player.y -= player_vel
+        if keys[pygame.K_s] and player.y + player_vel + player.get_height() + 10 < HEIGHT:  # down
+            player.y += player_vel
 
 
 main()
