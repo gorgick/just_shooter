@@ -26,7 +26,7 @@ class Ship:
         self.ship_image = None
 
     def draw(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50))
+        window.blit(self.ship_image, (self.x, self.y))
 
 
 class Player(Ship):
