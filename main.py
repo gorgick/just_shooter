@@ -1,4 +1,5 @@
 import os
+import random
 
 import pygame
 
@@ -89,11 +90,46 @@ class Player(Ship):
         super().draw(window)
 
 
+class EnemyShip(Ship):
+    NUM_MONSTERS = {
+        "1": (SPACE_SHIP_1, LASER),
+        "2": (SPACE_SHIP_2, LASER),
+        "3": (SPACE_SHIP_3, LASER)
+    }
+
+    def __init__(self, x, y, num_monstr, health=100):
+        super().__init__(x, y, health)
+        self.ship_image, self.laser_image = self.NUM_MONSTERS[num_monstr]
+        self.mask = pygame.mask.from_surface(self.ship_image)
+        self.rect = self.ship_image.get_rect()
+        self.rect.x = self.rect.width
+        self.rect.y = self.rect.height
+
+    def check_edges(self):
+        screen_rect = WIN.get_rect()
+        if self.rect.right >= screen_rect.right:
+            return True
+        elif self.rect.left <= 0:
+            return True
+
+    def move(self, vel, alien_speed_factor, fleet_direction):
+        self.y += vel
+        self.x += (alien_speed_factor * fleet_direction)
+        self.rect.x = self.x
+
+
 def main():
     run = True
     FPS = 60
     player_vel = 10
     laser_vel = 10
+    level = 0
+
+    enemies = []
+    wave_length = 10
+    enemy_vel = 3
+    alien_speed_factor = 4
+    fleet_direction = 1
 
     player = Player(570, 500)
 
@@ -101,6 +137,9 @@ def main():
 
     def redraw_window():
         WIN.blit(BG, (0, 0))
+
+        for enemy in enemies:
+            enemy.draw(WIN)
 
         player.draw(WIN)
         pygame.display.update()
@@ -111,6 +150,14 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        if len(enemies) == 0:
+            level += 1
+            wave_length += 5
+            for i in range(wave_length):
+                enemy = EnemyShip(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100),
+                                  random.choice(["1", "2", "3"]))
+                enemies.append(enemy)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -126,6 +173,14 @@ def main():
             player.y += player_vel
         if keys[pygame.K_SPACE]:
             player.shoot()
+
+        for enemy in enemies:
+            enemy.move(enemy_vel, alien_speed_factor, fleet_direction)
+            if random.randrange(0, 2 * 60) == 1:
+                enemy.shoot()
+            if enemy.check_edges():
+                fleet_direction *= -1
+                break
 
         player.move_lasers(-laser_vel)
 
