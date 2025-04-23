@@ -117,6 +117,12 @@ class EnemyShip(Ship):
         self.x += (alien_speed_factor * fleet_direction)
         self.rect.x = self.x
 
+    def shoot(self):
+        if self.cool_down_counter == 0:
+            laser = Laser(self.x - 20, self.y, self.laser_image)
+            self.lasers.append(laser)
+            self.cool_down_counter = 1
+
 
 def main():
     run = True
@@ -176,6 +182,7 @@ def main():
 
         for enemy in enemies:
             enemy.move(enemy_vel, alien_speed_factor, fleet_direction)
+            enemy.move_lasers(laser_vel)
             if random.randrange(0, 2 * 60) == 1:
                 enemy.shoot()
             if enemy.check_edges():
