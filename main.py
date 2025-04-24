@@ -34,6 +34,9 @@ class Laser:
     def off_screen(self, height):
         return not (self.y <= height and self.y >= 0)
 
+    def collisions(self, obj):
+        return collide(self, obj)
+
 
 class Ship:
     COOLDOWN = 20
@@ -52,11 +55,14 @@ class Ship:
         for laser in self.lasers:
             laser.draw(window)
 
-    def move_lasers(self, vel):
+    def move_lasers(self, vel, obj):
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
             if laser.off_screen(HEIGHT):
+                self.lasers.remove(laser)
+            elif laser.collisions(obj):
+                obj.health -= 10
                 self.lasers.remove(laser)
 
     def cooldown(self):
@@ -88,6 +94,18 @@ class Player(Ship):
 
     def draw(self, window):
         super().draw(window)
+
+    def move_lasers(self, vel, objs):
+        self.cooldown()
+        for laser in self.lasers:
+            laser.move(vel)
+            if laser.off_screen(HEIGHT):
+                self.lasers.remove(laser)
+            else:
+                for obj in objs:
+                    if laser.collisions(obj):
+                        objs.remove(obj)
+                        self.lasers.remove(laser)
 
 
 class EnemyShip(Ship):
@@ -124,6 +142,12 @@ class EnemyShip(Ship):
             self.cool_down_counter = 1
 
 
+def collide(obj1, obj2):
+    offset_x = obj2.x - obj1.x
+    offset_y = obj2.y - obj1.y
+    return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) != None
+
+
 def main():
     run = True
     FPS = 60
@@ -134,7 +158,7 @@ def main():
     enemies = []
     wave_length = 10
     enemy_vel = 3
-    alien_speed_factor = 4
+    alien_speed_factor = 2
     fleet_direction = 1
 
     player = Player(570, 500)
@@ -182,14 +206,20 @@ def main():
 
         for enemy in enemies:
             enemy.move(enemy_vel, alien_speed_factor, fleet_direction)
-            enemy.move_lasers(laser_vel)
+            enemy.move_lasers(laser_vel, player)
             if random.randrange(0, 2 * 60) == 1:
                 enemy.shoot()
             if enemy.check_edges():
                 fleet_direction *= -1
                 break
 
-        player.move_lasers(-laser_vel)
+            if collide(enemy, player):
+                player.health -= 10
+                enemies.remove(enemy)
+            elif enemy.y + enemy.get_height() > HEIGHT:
+                enemies.remove(enemy)
+
+        player.move_lasers(-laser_vel, enemies)
 
 
 main()
