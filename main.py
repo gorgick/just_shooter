@@ -2,6 +2,7 @@ import os
 import random
 
 import pygame
+
 pygame.font.init()
 
 WIDTH, HEIGHT = 1200, 600
@@ -157,12 +158,19 @@ def main():
     level = 0
     lives = 5
     main_font = pygame.font.SysFont("comicsans", 40)
+    lost_font = pygame.font.SysFont("comicsans", 60)
+
+    list_lost_labels = ["It's not your day", "You could be better", "Next time you must do it"]
+    random_ch = random.choice(list_lost_labels)
 
     enemies = []
     wave_length = 10
     enemy_vel = 3
     alien_speed_factor = 2
     fleet_direction = 1
+
+    lost = False
+    lost_count = 0
 
     player = Player(570, 500)
 
@@ -182,9 +190,9 @@ def main():
 
         player.draw(WIN)
 
-        # if lost:
-        #     lost_label = lost_font.render(f"{random_ch}", 1, (255, 255, 255))
-        #     WIN.blit(lost_label, (WIDTH / 2 - lost_label.get_width() / 2, 250))
+        if lost:
+            lost_label = lost_font.render(f"{random_ch}", 1, (255, 255, 255))
+            WIN.blit(lost_label, (WIDTH / 2 - lost_label.get_width() / 2, 250))
 
         pygame.display.update()
 
