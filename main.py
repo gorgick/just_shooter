@@ -96,6 +96,7 @@ class Player(Ship):
 
     def draw(self, window):
         super().draw(window)
+        self.healthbar(window)
 
     def move_lasers(self, vel, objs):
         self.cooldown()
@@ -108,6 +109,13 @@ class Player(Ship):
                     if laser.collisions(obj):
                         objs.remove(obj)
                         self.lasers.remove(laser)
+
+    def healthbar(self, window):
+        pygame.draw.rect(window, (255, 0, 0),
+                         (self.x, self.y + self.ship_image.get_height() + 10, self.ship_image.get_width(), 10))
+        pygame.draw.rect(window, (0, 255, 0),
+                         (self.x, self.y + self.ship_image.get_height() + 10,
+                          self.ship_image.get_width() * (self.health / self.max_health), 10))
 
 
 class EnemyShip(Ship):
@@ -199,9 +207,16 @@ def main():
     while run:
         clock.tick(FPS)
         redraw_window()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+
+        if lives <= 0 or player.health <= 0:
+            lost = True
+            lost_count += 1
+
+        if lost:
+            if lost_count > FPS * 4:
                 run = False
+            else:
+                continue
 
         if len(enemies) == 0:
             level += 1
