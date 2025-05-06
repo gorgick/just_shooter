@@ -254,6 +254,7 @@ def main():
                 player.health -= 10
                 enemies.remove(enemy)
             elif enemy.y + enemy.get_height() > HEIGHT:
+                lives -= 1
                 enemies.remove(enemy)
 
         player.move_lasers(-laser_vel, enemies)
