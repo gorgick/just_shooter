@@ -8,6 +8,9 @@ Algorithm:
 6. Draw levels, lives labels into main font, do final checks
 
 (*) Convert images for required sizes:
+
 -our_image = Image.open('images/your.jpg')
+
 -size_for_game = our_image.crop((0, 0, p1.width, p1.height)).resize((1200, 600))
+
 -size_for_game.save('images/your_resized_img.jpg')
